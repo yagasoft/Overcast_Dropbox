@@ -50,7 +50,7 @@ public class Dropbox extends CSP<DbxEntry.File, Downloader, Uploader> implements
 {
 
 	/** Constant: VERSION. */
-	public static final String VERSION = "1.05.0100";
+	public static final String VERSION = "1.20.0250";
 
 	/** The Dropbox singleton. */
 	static private Dropbox				instance;
