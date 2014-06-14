@@ -34,13 +34,13 @@ import com.yagasoft.overcast.implement.dropbox.Dropbox;
  */
 public class RemoteFile extends com.yagasoft.overcast.base.container.remote.RemoteFile<DbxEntry.File>
 {
-
+	
 	/**
 	 * Better use the factory in Dropbox class.
 	 */
 	public RemoteFile()
 	{}
-
+	
 	/**
 	 * @see com.yagasoft.overcast.base.container.Container#generateId()
 	 */
@@ -49,7 +49,7 @@ public class RemoteFile extends com.yagasoft.overcast.base.container.remote.Remo
 	{
 		// TODO generate id
 	}
-
+	
 	/**
 	 * @see com.yagasoft.overcast.base.container.Container#isExist()
 	 */
@@ -57,7 +57,7 @@ public class RemoteFile extends com.yagasoft.overcast.base.container.remote.Remo
 	public synchronized boolean isExist() throws AccessException
 	{
 		Logger.info("checking existence: " + path);
-
+		
 		// if fetching meta-data of the file fails, then it doesn't exist, probably.
 		try
 		{
@@ -68,11 +68,11 @@ public class RemoteFile extends com.yagasoft.overcast.base.container.remote.Remo
 			Logger.error("checking existence: " + path);
 			Logger.except(e);
 			e.printStackTrace();
-
+			
 			throw new AccessException("Couldn't determine existence! " + e.getMessage());
 		}
 	}
-
+	
 	/**
 	 * @see com.yagasoft.overcast.base.container.Container#updateInfo()
 	 */
@@ -83,12 +83,12 @@ public class RemoteFile extends com.yagasoft.overcast.base.container.remote.Remo
 		{
 			id = getSourceObject().rev;
 			name = getSourceObject().name;
-
+			
 			if (name == null)
 			{
 				name = "";
 			}
-
+			
 			try
 			{
 				size = getSourceObject().numBytes;
@@ -98,15 +98,15 @@ public class RemoteFile extends com.yagasoft.overcast.base.container.remote.Remo
 				size = 0;
 			}
 		}
-
+		
 		type = null;
-
+		
 		path = (((parent == null) || parent.getPath().equals("/")) ? "/" : (parent.getPath() + "/")) + name;
 		cleanPath();
-
+		
 		notifyOperationListeners();
 	}
-
+	
 	/**
 	 * @see com.yagasoft.overcast.base.container.Container#updateFromSource()
 	 */
@@ -114,12 +114,12 @@ public class RemoteFile extends com.yagasoft.overcast.base.container.remote.Remo
 	public synchronized void updateFromSource() throws OperationException
 	{
 		Logger.info("updating info from source: " + path);
-
+		
 		try
 		{
 			setSourceObject(Dropbox.dropboxService.getMetadata((getSourceObject() == null) ? path : getSourceObject().path)
 					.asFile());
-
+			
 			try
 			{
 				link = new URL(Dropbox.dropboxService.createTemporaryDirectUrl(getSourceObject().path).url);
@@ -128,7 +128,7 @@ public class RemoteFile extends com.yagasoft.overcast.base.container.remote.Remo
 			{
 				link = null;
 			}
-
+			
 			Logger.info("finished updating info from source: " + path);
 		}
 		catch (DbxException e)
@@ -136,18 +136,18 @@ public class RemoteFile extends com.yagasoft.overcast.base.container.remote.Remo
 			Logger.error("updating info from source: " + path);
 			Logger.except(e);
 			e.printStackTrace();
-
+			
 			throw new OperationException("Couldn't update info! " + e.getMessage());
 		}
 	}
-
+	
 	/**
 	 * @see com.yagasoft.overcast.base.container.Container#copyProcess(com.yagasoft.overcast.base.container.Folder)
 	 */
 	@Override
 	protected Container<?> copyProcess(Folder<?> destination)
 			throws OperationException
-			{
+	{
 		try
 		{
 			return Dropbox.getFactory().createFile(
@@ -157,8 +157,8 @@ public class RemoteFile extends com.yagasoft.overcast.base.container.remote.Remo
 		{
 			throw new OperationException(e.getMessage());
 		}
-			}
-
+	}
+	
 	/**
 	 * @see com.yagasoft.overcast.base.container.Container#moveProcess(com.yagasoft.overcast.base.container.Folder)
 	 */
@@ -175,7 +175,7 @@ public class RemoteFile extends com.yagasoft.overcast.base.container.remote.Remo
 			throw new OperationException(e.getMessage());
 		}
 	}
-
+	
 	/**
 	 * @see com.yagasoft.overcast.base.container.Container#renameProcess(java.lang.String)
 	 */
@@ -191,7 +191,7 @@ public class RemoteFile extends com.yagasoft.overcast.base.container.remote.Remo
 			throw new OperationException(e.getMessage());
 		}
 	}
-
+	
 	/**
 	 * @see com.yagasoft.overcast.base.container.Container#deleteProcess()
 	 */
@@ -207,5 +207,5 @@ public class RemoteFile extends com.yagasoft.overcast.base.container.remote.Remo
 			throw new OperationException(e.getMessage());
 		}
 	}
-
+	
 }

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2011-2014 by Ahmed Osama el-Sawalhy
  * 
  *		The Modified MIT Licence (GPL v3 compatible)
@@ -37,7 +37,7 @@ import com.yagasoft.overcast.implement.dropbox.Dropbox;
  */
 public class Uploader
 {
-
+	
 	/** The size. */
 	long							size;
 	
@@ -58,10 +58,10 @@ public class Uploader
 	
 	/** flag to stop uploading. */
 	boolean							stop		= false;
-
+	
 	/** The listeners to this upload. */
 	ArrayList<IProgressListener>	listeners	= new ArrayList<IProgressListener>();
-
+	
 	/**
 	 * Instantiates a new uploader.
 	 * 
@@ -79,9 +79,9 @@ public class Uploader
 		this.remoteParentPath = remoteParentPath;
 		this.localFilePath = localFilePath;
 		this.uploadJob = uploadJob;
-
+		
 		localFile = Paths.get(localFilePath);
-
+		
 		try
 		{
 			// fetch the file size to calculate upload completion.
@@ -93,7 +93,7 @@ public class Uploader
 			throw new TransferException("Failed to upload file! " + e.getMessage());
 		}
 	}
-
+	
 	/**
 	 * Start the upload based on the parameters set.
 	 * 
@@ -108,16 +108,16 @@ public class Uploader
 		// use buffers to read the file in case the file is too big for simpler API methods.
 		RandomAccessFile file = null;
 		FileChannel channel = null;
-
+		
 		try
 		{
 			long offset = 0;
-
+			
 			// prepare file channel and buffer to read the file chunks.
 			file = new RandomAccessFile(localFilePath, "r");
 			channel = file.getChannel();
 			ByteBuffer buffer = ByteBuffer.allocate(chunkSize);
-
+			
 			// read first chunk and upload it.
 			channel.read(buffer);
 			buffer.flip();
@@ -129,7 +129,7 @@ public class Uploader
 			offset += buffer.remaining();		// increment offset; used for remote marker.
 			notifyProgressListeners(TransferState.IN_PROGRESS, (offset / (float) size));
 			buffer.clear();
-
+			
 			// upload the rest of the file chunks.
 			while (channel.read(buffer) > 0)
 			{
@@ -137,7 +137,7 @@ public class Uploader
 				{
 					break;
 				}
-
+				
 				buffer.flip();
 				Dropbox.getDropboxService().chunkedUploadAppend(uploadId, offset, buffer.array());
 				offset += buffer.remaining();
@@ -146,7 +146,7 @@ public class Uploader
 				notifyProgressListeners(TransferState.IN_PROGRESS, (offset / (float) size));
 				buffer.clear();
 			}
-
+			
 			if (stop)
 			{
 				Logger.info("upload cancelled: " + localFilePath);
@@ -154,7 +154,7 @@ public class Uploader
 				notifyProgressListeners(TransferState.CANCELLED, 0.0f);
 				return null;
 			}
-
+			
 			// the file uploaded is in the void; move it to the proper path.
 			return Dropbox.getDropboxService().chunkedUploadFinish(remoteParentPath + "/" + localFile.getFileName().toString()
 					, DbxWriteMode.add(), uploadId);
@@ -181,7 +181,7 @@ public class Uploader
 			}
 		}
 	}
-
+	
 	/**
 	 * Adds the progress listener.
 	 * 
@@ -192,7 +192,7 @@ public class Uploader
 	{
 		listeners.add(listener);
 	}
-
+	
 	/**
 	 * Notify progress listeners.
 	 * 
@@ -204,9 +204,9 @@ public class Uploader
 	public void notifyProgressListeners(TransferState state, float progress)
 	{
 		listeners.parallelStream()
-			.forEach(listener -> listener.progressChanged(uploadJob, state, progress));
+				.forEach(listener -> listener.progressChanged(uploadJob, state, progress));
 	}
-
+	
 	/**
 	 * Removes the progress listener.
 	 * 
@@ -217,7 +217,7 @@ public class Uploader
 	{
 		listeners.remove(listener);
 	}
-
+	
 	/**
 	 * Clear progress listeners.
 	 */
@@ -225,7 +225,7 @@ public class Uploader
 	{
 		listeners.clear();
 	}
-
+	
 	/**
 	 * Cancel.
 	 */

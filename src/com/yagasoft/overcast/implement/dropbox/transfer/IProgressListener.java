@@ -12,10 +12,9 @@
 
 package com.yagasoft.overcast.implement.dropbox.transfer;
 
+
 import com.yagasoft.overcast.base.container.transfer.event.ITransferProgressListener;
 import com.yagasoft.overcast.base.container.transfer.event.TransferState;
-
-
 
 
 /**
@@ -34,7 +33,7 @@ import com.yagasoft.overcast.base.container.transfer.event.TransferState;
  */
 public interface IProgressListener
 {
-
+	
 	/**
 	 * Progress changed.
 	 *
@@ -46,7 +45,7 @@ public interface IProgressListener
 	 *            the progress
 	 */
 	public void progressChanged(UploadJob uploadJob, TransferState state, float progress);
-
+	
 	/**
 	 * Progress changed.
 	 *

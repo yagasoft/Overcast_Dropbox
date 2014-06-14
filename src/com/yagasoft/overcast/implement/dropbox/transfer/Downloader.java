@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2011-2014 by Ahmed Osama el-Sawalhy
  * 
  *		The Modified MIT Licence (GPL v3 compatible)
@@ -181,7 +181,7 @@ public class Downloader
 	public void notifyProgressListeners(TransferState state, float progress)
 	{
 		listeners.parallelStream()
-			.forEach(listener -> listener.progressChanged(downloadJob, state, progress));
+				.forEach(listener -> listener.progressChanged(downloadJob, state, progress));
 	}
 	
 	/**

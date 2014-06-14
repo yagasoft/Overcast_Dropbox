@@ -1,28 +1,29 @@
 
 package com.yagasoft.overcast.implement.dropbox.authorisation;
 
+
 /*
-Copyright (c) 2013 Dropbox Inc., http://www.dropbox.com/
+ Copyright (c) 2013 Dropbox Inc., http://www.dropbox.com/
 
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of this software and associated documentation files (the
-"Software"), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
-the following conditions:
+ Permission is hereby granted, free of charge, to any person obtaining
+ a copy of this software and associated documentation files (the
+ "Software"), to deal in the Software without restriction, including
+ without limitation the rights to use, copy, modify, merge, publish,
+ distribute, sublicense, and/or sell copies of the Software, and to
+ permit persons to whom the Software is furnished to do so, subject to
+ the following conditions:
 
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
+ The above copyright notice and this permission notice shall be
+ included in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 
 import com.dropbox.core.DbxAppInfo;
 import com.dropbox.core.DbxAuthFinish;
@@ -52,29 +53,29 @@ import com.dropbox.core.DbxWebAuth;
  * {@link DbxRequestConfig} requestConfig = new DbxRequestConfig("text-edit/0.1", userLocale);
  * {@link DbxAppInfo} appInfo = DbxAppInfo.Reader.readFromFile("api.app");
  * DbxWebAuthNoRedirect webAuth = new DbxWebAuthNoRedirect(requestConfig, appInfo);
- *
+ * 
  * String authorizeUrl = webAuth.start();
  * System.out.println("1. Go to " + authorizeUrl);
  * System.out.println("2. Click \"Allow\" (you might have to log in first).");
  * System.out.println("3. Copy the authorization code.");
  * System.out.print("Enter the authorization code here: ");
- *
+ * 
  * String code = new BufferedReader(new InputStreamReader(System.in)).readLine();
  * if (code == null) return;
  * code = code.trim();
- *
+ * 
  * {@link DbxAuthFinish} authFinish = webAuth.finish(code);
- *
+ * 
  * {@link DbxClient} client = new DbxClient(requestConfig, authFinish.accessToken);
  * </pre>
  */
 public class DbxWebAuthNoRedirect
 {
-
+	
 	private final DbxRequestConfig	requestConfig;
 	private final DbxAppInfo		appInfo;
-	private final String redirectUri;
-
+	private final String			redirectUri;
+	
 	/**
 	 * @param appInfo
 	 *            Your application's Dropbox API information (the app key and secret).
@@ -89,12 +90,12 @@ public class DbxWebAuthNoRedirect
 		{
 			throw new IllegalArgumentException("'appInfo' is null");
 		}
-
+		
 		this.requestConfig = requestConfig;
 		this.appInfo = appInfo;
 		this.redirectUri = redirectUri;
 	}
-
+	
 	/**
 	 * Start authorization. Returns a "authorization URL" on the Dropbox website that gives the
 	 * lets the user grant your app access to their Dropbox account.
@@ -108,7 +109,7 @@ public class DbxWebAuthNoRedirect
 	{
 		return DbxWebAuthHelper.getAuthorizeUrl(appInfo, requestConfig.userLocale, redirectUri, null);
 	}
-
+	
 	/**
 	 * Call this after the user has visited the authorizaton URL and copy/pasted the authorization
 	 * code that Dropbox gave them.
@@ -124,7 +125,7 @@ public class DbxWebAuthNoRedirect
 		{
 			throw new IllegalArgumentException("'code' can't be null");
 		}
-
+		
 		return DbxWebAuthHelper.finish(appInfo, requestConfig, code, redirectUri);
 	}
 }

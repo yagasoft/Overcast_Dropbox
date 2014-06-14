@@ -1,11 +1,11 @@
-/* 
+/*
  * Copyright (C) 2011-2014 by Ahmed Osama el-Sawalhy
- * 
+ *
  *		The Modified MIT Licence (GPL v3 compatible)
  * 			License terms are in a separate file (LICENCE.md)
- * 
+ *
  *		Project/File: Overcast/com.yagasoft.overcast.implement.dropbox.transfer/DownloadJob.java
- * 
+ *
  *			Modified: Apr 15, 2014 (1:19:56 PM)
  *			   Using: Eclipse J-EE / JDK 7 / Windows 8.1 x64
  */
@@ -14,6 +14,7 @@ package com.yagasoft.overcast.implement.dropbox.transfer;
 
 
 import com.yagasoft.overcast.base.container.local.LocalFolder;
+import com.yagasoft.overcast.base.container.transfer.event.TransferState;
 import com.yagasoft.overcast.implement.dropbox.container.RemoteFile;
 
 
@@ -28,7 +29,7 @@ public class DownloadJob extends com.yagasoft.overcast.base.container.transfer.D
 	
 	/**
 	 * Instantiates a new download job.
-	 * 
+	 *
 	 * @param remoteFile
 	 *            Remote file.
 	 * @param parent
@@ -54,6 +55,8 @@ public class DownloadJob extends com.yagasoft.overcast.base.container.transfer.D
 	public void cancelTransfer()
 	{
 		canceller.cancel();
+		notifyProgressListeners(TransferState.CANCELLED, 0.0f);
+		remoteFile.getCsp().resetDownload();
 	}
 	
 	/**
