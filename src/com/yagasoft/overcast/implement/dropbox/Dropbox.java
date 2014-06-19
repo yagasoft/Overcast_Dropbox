@@ -194,11 +194,11 @@ public class Dropbox extends CSP<DbxEntry.File, Downloader, Uploader> implements
 	}
 	
 	/**
-	 * @see com.yagasoft.overcast.base.csp.CSP#downloadProcess(com.yagasoft.overcast.base.container.remote.RemoteFile,
+	 * @see com.yagasoft.overcast.base.csp.CSP#initDownload(com.yagasoft.overcast.base.container.remote.RemoteFile,
 	 *      com.yagasoft.overcast.base.container.local.LocalFolder, boolean)
 	 */
 	@Override
-	protected DownloadJob downloadProcess(com.yagasoft.overcast.base.container.remote.RemoteFile<?> file, LocalFolder parent
+	protected DownloadJob initDownload(com.yagasoft.overcast.base.container.remote.RemoteFile<?> file, LocalFolder parent
 			, boolean overwrite) throws TransferException
 	{
 		// create a download job.
@@ -247,7 +247,7 @@ public class Dropbox extends CSP<DbxEntry.File, Downloader, Uploader> implements
 	}
 	
 	@Override
-	protected UploadJob uploadProcess(LocalFile file, com.yagasoft.overcast.base.container.remote.RemoteFolder<?> parent
+	protected UploadJob initUpload(LocalFile file, com.yagasoft.overcast.base.container.remote.RemoteFolder<?> parent
 			, boolean overwrite, com.yagasoft.overcast.base.container.remote.RemoteFile<?> remoteFile) throws TransferException
 	{
 		// create an upload job.

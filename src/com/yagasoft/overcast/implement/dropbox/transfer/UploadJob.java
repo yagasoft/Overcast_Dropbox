@@ -60,7 +60,6 @@ public class UploadJob extends com.yagasoft.overcast.base.container.transfer.Upl
 	{
 		canceller.cancel();
 		notifyProgressListeners(TransferState.CANCELLED, 0.0f);
-		remoteFile.getCsp().resetUpload();
 	}
 	
 	/**

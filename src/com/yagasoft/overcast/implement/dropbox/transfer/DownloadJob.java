@@ -56,7 +56,6 @@ public class DownloadJob extends com.yagasoft.overcast.base.container.transfer.D
 	{
 		canceller.cancel();
 		notifyProgressListeners(TransferState.CANCELLED, 0.0f);
-		remoteFile.getCsp().resetDownload();
 	}
 	
 	/**

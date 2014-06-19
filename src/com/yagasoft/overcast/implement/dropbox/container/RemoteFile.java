@@ -83,6 +83,7 @@ public class RemoteFile extends com.yagasoft.overcast.base.container.remote.Remo
 		{
 			id = getSourceObject().rev;
 			name = getSourceObject().name;
+			date = getSourceObject().clientMtime.getTime();
 			
 			if (name == null)
 			{
