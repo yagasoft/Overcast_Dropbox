@@ -75,7 +75,7 @@ public class RemoteFolder extends com.yagasoft.overcast.base.container.remote.Re
 	@Override
 	public synchronized boolean isExist() throws AccessException
 	{
-		Logger.info("checking existence: " + path);
+		Logger.info("DROPBOX: FOLDER: checking existence: " + path);
 
 		// if fetching meta-data of the file fails, then it doesn't exist, probably.
 		try
@@ -84,7 +84,7 @@ public class RemoteFolder extends com.yagasoft.overcast.base.container.remote.Re
 		}
 		catch (DbxException e)
 		{
-			Logger.error("can't determine if folder exists or not: " + path);
+			Logger.error("DROPBOX: FOLDER: failed to determine if folder exists or not: " + path);
 			Logger.except(e);
 			e.printStackTrace();
 
@@ -187,22 +187,8 @@ public class RemoteFolder extends com.yagasoft.overcast.base.container.remote.Re
 	@Override
 	public synchronized void updateFromSource(boolean folderContents, boolean recursively) throws OperationException
 	{
-		// go through all the children. This is done first thing so that it doesn't load the tree recursively!
-		if (recursively)
-		{
-			for (Folder<?> folder : getFoldersArray())
-			{
-				folder.updateFromSource(folderContents, recursively);
-			}
-		}
+		Logger.info("DROPBOX: FOLDER: UPDATING info from source: " + path);
 
-		Logger.info("updating info from source: " + path);
-
-		// refresh children list.
-		if (folderContents)
-		{
-			buildTree(false);
-		}
 
 		try
 		{
@@ -220,16 +206,38 @@ public class RemoteFolder extends com.yagasoft.overcast.base.container.remote.Re
 				link = null;
 			}
 
-			Logger.info("finished updating info from source: " + path);
+			if (folderContents || recursively)
+			{
+				buildTree(false);
+			}
+
+			Logger.info("DROPBOX: FOLDER: FINISHED updating info from source: " + path);
 		}
 		catch (DbxException e)
 		{
-			Logger.error("updating info from source: " + path);
+			Logger.error("DROPBOX: FOLDER: FAILED to update info from source: " + path);
 			Logger.except(e);
 			e.printStackTrace();
 
 			throw new OperationException("Couldn't update info! " + e.getMessage());
 		}
+
+		// go through all the children. This is done first thing so that it doesn't load the tree recursively!
+		if (recursively)
+		{
+			for (Folder<?> folder : getFoldersArray())
+			{
+				folder.updateFromSource(folderContents, recursively);
+			}
+		}
+		else if (folderContents)
+		{	// refresh children list.
+			for (Folder<?> folder : getFoldersArray())
+			{
+				folder.updateFromSource(false, false);
+			}
+		}
+
 	}
 
 	/**

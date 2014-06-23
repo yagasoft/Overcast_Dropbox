@@ -56,7 +56,7 @@ public class RemoteFile extends com.yagasoft.overcast.base.container.remote.Remo
 	@Override
 	public synchronized boolean isExist() throws AccessException
 	{
-		Logger.info("checking existence: " + path);
+		Logger.info("DROPBOX: FILE: failed to create checking existence: " + path);
 		
 		// if fetching meta-data of the file fails, then it doesn't exist, probably.
 		try
@@ -65,7 +65,7 @@ public class RemoteFile extends com.yagasoft.overcast.base.container.remote.Remo
 		}
 		catch (DbxException e)
 		{
-			Logger.error("checking existence: " + path);
+			Logger.error("DROPBOX: FILE: failed to check existence: " + path);
 			Logger.except(e);
 			e.printStackTrace();
 			
@@ -114,7 +114,7 @@ public class RemoteFile extends com.yagasoft.overcast.base.container.remote.Remo
 	@Override
 	public synchronized void updateFromSource() throws OperationException
 	{
-		Logger.info("updating info from source: " + path);
+		Logger.info("DROPBOX: FILE: updating info from source: " + path);
 		
 		try
 		{
@@ -130,11 +130,11 @@ public class RemoteFile extends com.yagasoft.overcast.base.container.remote.Remo
 				link = null;
 			}
 			
-			Logger.info("finished updating info from source: " + path);
+			Logger.info("DROPBOX: FILE: finished updating info from source: " + path);
 		}
 		catch (DbxException e)
 		{
-			Logger.error("updating info from source: " + path);
+			Logger.error("DROPBOX: FILE: failed to update info from source: " + path);
 			Logger.except(e);
 			e.printStackTrace();
 			

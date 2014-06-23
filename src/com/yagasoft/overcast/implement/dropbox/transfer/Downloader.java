@@ -92,7 +92,7 @@ public class Downloader
 	 */
 	public File startDownload() throws TransferException
 	{
-		Logger.info("started file download: " + remoteFilePath);
+		Logger.info("DROPBOX: DOWNLOAD: started file download: " + remoteFilePath);
 		
 		try
 		{
@@ -109,7 +109,7 @@ public class Downloader
 					try
 					{
 						downloaded = Files.size(localFile);
-						Logger.info("downloaded " + NumberFormat.getPercentInstance().format(downloaded / (double) size)
+						Logger.info("DROPBOX: DOWNLOAD: downloaded " + NumberFormat.getPercentInstance().format(downloaded / (double) size)
 								+ " done. " + remoteFilePath);
 						notifyProgressListeners(TransferState.IN_PROGRESS, (downloaded / (float) size));
 						Thread.sleep(1000);
@@ -132,13 +132,13 @@ public class Downloader
 			
 			if ( !done)
 			{
-				Logger.error("failed to download file: " + remoteFilePath);
+				Logger.error("DROPBOX: DOWNLOAD: failed: " + remoteFilePath);
 				
 				throw new TransferException("Failed to download file! " + e.getMessage());
 			}
 			else
 			{
-				Logger.info("cancelled download: " + remoteFilePath);
+				Logger.info("DROPBOX: DOWNLOAD: cancelled: " + remoteFilePath);
 				
 				notifyProgressListeners(TransferState.CANCELLED, 0.0f);
 				return null;

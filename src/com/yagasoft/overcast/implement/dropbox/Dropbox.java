@@ -6,7 +6,7 @@
  *
  *		Project/File: Overcast_Dropbox/com.yagasoft.overcast.implement.dropbox/Dropbox.java
  *
- *			Modified: 23-Jun-2014 (20:09:17)
+ *			Modified: 24-Jun-2014 (01:22:52)
  *			   Using: Eclipse J-EE / JDK 8 / Windows 8.1 x64
  */
 
@@ -88,7 +88,7 @@ public class Dropbox extends CSP<DbxEntry.File, Downloader, Uploader> implements
 	 */
 	private Dropbox(String userID, int port) throws CSPBuildException, AuthorisationException
 	{
-		Logger.info("DROPBOX: BUILDING main object");
+		Logger.info("DROPBOX: CSP: building main object");
 
 		requestConfig = new DbxRequestConfig(userID, userLocale);
 
@@ -106,7 +106,7 @@ public class Dropbox extends CSP<DbxEntry.File, Downloader, Uploader> implements
 
 		name = "Dropbox";
 
-		Logger.info("DROPBOX: DONE building main object");
+		Logger.info("DROPBOX: CSP: done building main object");
 	}
 
 	/**
@@ -195,14 +195,29 @@ public class Dropbox extends CSP<DbxEntry.File, Downloader, Uploader> implements
 				remoteFileTree.addOperationListener(listener, Operation.ADD);
 				remoteFileTree.addOperationListener(listener, Operation.REMOVE);
 			}
-
-			// buildFileTree(false);
 		}
 		catch (CreationException e)
 		{
-			Logger.error("can't initialise tree");
+			Logger.error("DROPBOX: CSP: can't initialise tree");
 			Logger.except(e);
 			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * @see com.yagasoft.overcast.base.csp.CSP#resetPermission()
+	 */
+	@Override
+	public void resetPermission() throws AuthorisationException, OperationException
+	{
+		authorisation.resetPermission();
+
+		dropboxService = new DbxClient(requestConfig, authorisation.getAuthInfo().accessToken
+				, authorisation.getAuthInfo().host);
+
+		if (!remoteFileTree.getChildrenList().isEmpty())
+		{
+			remoteFileTree.updateFromSource(true, false);
 		}
 	}
 
@@ -217,19 +232,19 @@ public class Dropbox extends CSP<DbxEntry.File, Downloader, Uploader> implements
 	@Override
 	public long calculateRemoteFreeSpace() throws OperationException
 	{
-		Logger.info("getting dropbox freespace");
+		Logger.info("DROPBOX: FREESPACE: fetching");
 
 		try
 		{
 			DbxAccountInfo info = dropboxService.getAccountInfo();
 
-			Logger.info("got dropbox freespace");
+			Logger.info("DROPBOX: FREESPACE: done");
 
 			return (info.quota.total - (info.quota.normal + info.quota.shared));
 		}
 		catch (DbxException e)
 		{
-			Logger.error("failed to get free space: Dropbox");
+			Logger.error("DROPBOX: FREESPACE: failed");
 			Logger.except(e);
 			e.printStackTrace();
 

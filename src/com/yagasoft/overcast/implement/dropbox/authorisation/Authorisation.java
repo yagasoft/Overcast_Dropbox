@@ -18,6 +18,7 @@ import java.awt.Desktop.Action;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
 
 import com.dropbox.core.DbxAppInfo;
 import com.dropbox.core.DbxAuthFinish;
@@ -39,22 +40,22 @@ import com.yagasoft.overcast.implement.dropbox.Dropbox;
  */
 public class Authorisation extends OAuth
 {
-	
+
 	/** Receiver. */
 	private LocalServerReceiver	receiver;
-	
+
 	/** Redirect URI. */
 	private String				redirectUri;
-	
+
 	/** Auth finishing object. */
 	private DbxAuthFinish		authFinish;
-	
+
 	/** App info. */
 	private DbxAppInfo			appInfo;
-	
+
 	/** Auth info. */
 	protected DbxAuthInfo		authInfo;
-	
+
 	/**
 	 * Instantiates a new authorisation.
 	 *
@@ -69,7 +70,7 @@ public class Authorisation extends OAuth
 	{
 		this("user", infoFile, port);
 	}
-	
+
 	/**
 	 * Instantiates a new authorisation.
 	 *
@@ -88,7 +89,7 @@ public class Authorisation extends OAuth
 		this.userID = userID;
 		setupServer(port);
 	}
-	
+
 	/**
 	 * Sets the up server to receive authorisation code.
 	 *
@@ -100,7 +101,7 @@ public class Authorisation extends OAuth
 		receiver = new LocalServerReceiver("localhost", port);
 		redirectUri = receiver.getUri();
 	}
-	
+
 	/**
 	 * @see com.yagasoft.overcast.base.csp.authorisation.Authorisation#authorise()
 	 */
@@ -117,107 +118,125 @@ public class Authorisation extends OAuth
 			acquirePermission();		// open browser to ask for user permission, then save token.
 		}
 	}
-	
+
 	/**
 	 * @see com.yagasoft.overcast.base.csp.authorisation.OAuth#acquirePermission()
 	 */
 	@Override
 	public void acquirePermission() throws AuthorisationException
 	{
-		Logger.info("authorising: Dropbox");
-		
+		Logger.info("DROPBOX: AUTH: started");
+
 		try
 		{
 			// Read app info file (contains app key and app secret)
 			appInfo = DbxAppInfo.Reader.readFromFile(infoFile.toString());
-			
+
 			// Run through Dropbox API authorization process
 			DbxWebAuthNoRedirect webAuth = new DbxWebAuthNoRedirect(Dropbox.getRequestConfig(), appInfo, redirectUri);
 			String authoriseUrl = webAuth.start();		// get URL to send to browser
 			String code = authorise(authoriseUrl, redirectUri);		// opens browser and get access code.
-			
+
 			// problem with getting code from browser?
 			if (code == null)
 			{
-				Logger.error("failed to get code: Dropbox");
+				Logger.error("DROPBOX: AUTH: FAILED to get code");
 				throw new AuthorisationException("Failed to authorise!");
 			}
-			
+
 			code = code.trim();
 			authFinish = webAuth.finish(code);		// get access token using access code.
-			
+
 			saveToken();
-			
-			Logger.info("authorisation successful: Dropbox");
+
+			Logger.info("DROPBOX: AUTH: successful");
 		}
 		catch (FileLoadException | DbxException e)
 		{
-			Logger.error("authorisation failed: Dropbox");
+			Logger.error("DROPBOX: AUTH: failed");
 			Logger.except(e);
 			e.printStackTrace();
-			
+
 			throw new AuthorisationException("Failed to authorise! " + e.getMessage());
 		}
-		
+
 	}
-	
+
 	/**
 	 * @see com.yagasoft.overcast.base.csp.authorisation.OAuth#reacquirePermission()
 	 */
 	@Override
 	public void reacquirePermission() throws AuthorisationException
 	{
-		Logger.info("re-acquiring permission: Dropbox");
-		
+		Logger.info("DROPBOX: AUTH: re-acquiring permission");
+
 		try
 		{
 			// read the token from disk.
 			authInfo = DbxAuthInfo.Reader.readFromFile(new File(tokenParent.toFile(), "dropbox"));
-			
+
 			// make sure the token is valid.
 			DbxClient dbxClient = new DbxClient(Dropbox.getRequestConfig(), authInfo.accessToken, authInfo.host);
 			dbxClient.getAccountInfo();
-			
-			Logger.info("done acquiring permission: Dropbox");
+
+			Logger.info("DROPBOX: AUTH: DONE acquiring permission");
 		}
 		catch (FileLoadException | DbxException e)
 		{
-			Logger.error("failed to re-acquire permission: Dropbox");
+			Logger.error("DROPBOX: AUTH: FAILED to re-acquire permission");
 			Logger.except(e);
 			e.printStackTrace();
-			
+
 			throw new AuthorisationException("Failed to authorise! " + e.getMessage());
 		}
 	}
-	
+
+	@Override
+	public void resetPermission() throws AuthorisationException
+	{
+		try
+		{
+			Files.deleteIfExists(tokenParent.resolve("dropbox"));
+			authorise();
+		}
+		catch (IOException e)
+		{
+			Logger.error("DROPBOX: AUTH: FAILED to delete token file");
+			Logger.except(e);
+			e.printStackTrace();
+
+			throw new AuthorisationException("authorisation failed to delete token file: Google");
+		}
+	}
+
 	/**
 	 * @see com.yagasoft.overcast.base.csp.authorisation.OAuth#saveToken()
 	 */
 	@Override
 	protected void saveToken() throws AuthorisationException
 	{
-		Logger.info("Saving token: Dropbox");
-		
+		Logger.info("DROPBOX: AUTH: saving token");
+
 		try
 		{
 			// prepare access token to be saved to disk.
 			authInfo = new DbxAuthInfo(authFinish.accessToken, appInfo.host);
-			
+
 			// Save auth information to output file.
 			DbxAuthInfo.Writer.writeToFile(authInfo, new File(tokenParent.toFile(), "dropbox"));
-			
-			Logger.info("saved token: Dropbox");
+
+			Logger.info("DROPBOX: AUTH: saved token");
 		}
 		catch (IOException e)
 		{
-			Logger.error("problem saving token: Dropbox");
+			Logger.error("DROPBOX: AUTH: problem saving token");
 			Logger.except(e);
 			e.printStackTrace();
-			
+
 			throw new AuthorisationException("Failed to authorise! " + e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * Authorises the installed application to access user's protected data.
 	 *
@@ -236,33 +255,33 @@ public class Authorisation extends OAuth
 		// server parameters set?
 		if (receiver == null)
 		{
-			Logger.error("server not setup: Dropbox");
+			Logger.error("DROPBOX: AUTH: server not setup");
 			throw new AuthorisationException("Failed to authorise! Server not setup.");
 		}
-		
+
 		try
 		{
 			// open browser to get access code.
 			browse(url + "&redirect_uri=" + receiver.getRedirectUri());
-			
+
 			// receive authorisation code.
 			String code = receiver.waitForCode();
-			
+
 			// stop the listening server.
 			receiver.stop();
-			
+
 			return code;
 		}
 		catch (IOException e)
 		{
-			Logger.error("problem with acquiring code: Dropbox");
+			Logger.error("DROPBOX: AUTH: problem with acquiring code");
 			Logger.except(e);
 			e.printStackTrace();
-			
+
 			throw new AuthorisationException("Failed to authorise! " + e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * Open a browser at the given URL using {@link Desktop} if available, or alternatively output the
 	 * URL to {@link System#out} for command-line applications.
@@ -276,7 +295,7 @@ public class Authorisation extends OAuth
 		// Ask user to open in their browser using copy-paste
 		System.out.println("Please open the following address in your browser:");
 		System.out.println("  " + url);
-		
+
 		// Attempt to open it in the browser
 		try
 		{
@@ -292,10 +311,10 @@ public class Authorisation extends OAuth
 		}
 		catch (IOException | InternalError e)
 		{
-			Logger.error("problem with browsing: Dropbox");
+			Logger.error("DROPBOX: AUTH: problem with browsing");
 			Logger.except((Exception) e);
 			e.printStackTrace();
-			
+
 			// A bug in a JRE can cause Desktop.isDesktopSupported() to throw an
 			// InternalError rather than returning false. The error reads,
 			// "Can't connect to X11 window server using ':0.0' as the value of the
@@ -303,7 +322,7 @@ public class Authorisation extends OAuth
 			throw new AuthorisationException("Failed to authorise! " + e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * @return the appInfo
 	 */
@@ -311,7 +330,7 @@ public class Authorisation extends OAuth
 	{
 		return appInfo;
 	}
-	
+
 	/**
 	 * @param appInfo
 	 *            the appInfo to set
@@ -320,7 +339,7 @@ public class Authorisation extends OAuth
 	{
 		this.appInfo = appInfo;
 	}
-	
+
 	/**
 	 * @return the authInfo
 	 */
@@ -328,7 +347,7 @@ public class Authorisation extends OAuth
 	{
 		return authInfo;
 	}
-	
+
 	/**
 	 * @param authInfo
 	 *            the authInfo to set
@@ -337,5 +356,5 @@ public class Authorisation extends OAuth
 	{
 		this.authInfo = authInfo;
 	}
-	
+
 }
