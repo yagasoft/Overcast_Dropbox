@@ -7,9 +7,19 @@ A façade implementation of Overcast for Dropbox.
 
   Same as Overcast
 
-### Developers' notes:
+### Instructions:
 
-  + You have to manually download the libraries and import them into your project, for now.
+###### Dependencies:
+
+    +	Java 8
+	+	Overcast: https://github.com/os008/Overcast
+	+	Google Drive Java API: https://developers.google.com/api-client-library/java/apis/drive/v2
+	+	Dropbox Java API: https://www.dropbox.com/developers/core/start/java
+	+	Logger: https://github.com/os008/Logger
+
+### Notes:
+
+  + You have to manually download the libraries and import them into your project.
 
 
 <br>
