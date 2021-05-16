@@ -1,6 +1,8 @@
 Overcast - Dropbox implementation v1.20.0250
 ===========================================
 
+(No longer maintained!)
+
 A façade implementation of Overcast for Dropbox.
 
 ### Features:
